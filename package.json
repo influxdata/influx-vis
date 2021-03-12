@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": {
+    "packages": [
+      "ui"
+    ]
+  },
+  "scripts": {
+    "start": "yarn --cwd ui start"
+  }
+}
