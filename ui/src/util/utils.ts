@@ -35,11 +35,29 @@ export const zip = <A, B>(arr1: A[], arr2: B[]): [A, B][] => {
 declare global {
   interface Array<T> {
     unique(): Array<T>;
+    /**
+     * faster alternative of unique for string arrays
+     */
+    uniqueStr(): Array<string>;
+
+    limit(entries: number): Array<T>;
   }
 }
+
 
 if (!Array.prototype.unique) {
   Array.prototype.unique = function <T>(this: T[]): T[] {
     return this.filter((x, i) => this.findIndex(y => y === x) === i);
   }
+  Array.prototype.uniqueStr = function (this: string[]): string[] {
+    const obj: { [key: string]: true } = {};
+    this.forEach(x => obj[x] = true);
+    return Object.keys(obj);
+  }
 }
+if (!Array.prototype.limit) {
+  Array.prototype.limit = function <T>(this: T[], entries: number) {
+    return this.filter((_, i) => i < entries);
+  }
+}
+

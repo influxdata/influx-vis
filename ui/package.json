@@ -27,6 +27,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "recharts": "^2.0.8",
+    "simplex-noise": "^2.4.0",
     "typescript": "~3.7.2"
   },
   "scripts": {

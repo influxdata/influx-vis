@@ -7,6 +7,7 @@ import { useInfluxSource } from "../views/InfluxSource";
 import "../util/utils";
 import { Option } from "antd/lib/mentions";
 import FormItem from "antd/lib/form/FormItem";
+import { range } from "../util/utils";
 
 type TRechartsPageProps = {
 
@@ -59,45 +60,19 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
   //   }
   // ];
 
-  const { element: influxSourceElement, table, tableVis } = useInfluxSource();
+  const { element: influxSourceElement, table, tableVis, keys, data } = useInfluxSource();
 
-  const time = table.getColumn("_time", "number") as number[];
-  const values = table.getColumn("_value", "number") as number[] || [];
-  const fields = table.getColumn("_field", "string") as string[] || [];
-
-  const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value" && x !== "_field")
-
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-
-  // todo: hashed
-  const data = !time
-    ? []
-    : time
-      .filter((x, i) => time.findIndex((y) => y === x) === i)
-      .map((x: number) => ({ _time: x } as { _time: number, [key: string]: number }))
-    ;
-
-  // const keys = selectedColumns.map(x=> table.getColumn(x,))
-
-  if (time?.length)
-    time?.forEach((time, i) => {
-      const field = fields[i];
-      const value = values[i];
-
-      data.find(x => x._time === time)![field] = value;
-    });
-
-  const uniqueFields = fields.unique();
+  const rechartsData = Object.entries(data).map(([key, values]) => ({ ...values, _time: key }))
 
   const Chart = () =>
     <ResponsiveContainer height="100%" minHeight="200px">
-      <LineChart data={data}>
+      <LineChart data={rechartsData}>
         <XAxis
           dataKey="_time"
         />
         <YAxis />
         {
-          uniqueFields.map(x =>
+          keys.map(x =>
             <Line
               isAnimationActive={false}
               dataKey={x}
@@ -131,18 +106,16 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%" }} bodyStyle={{ height: "100%" }}>
           {influxSourceElement}
-          <FormItem>
-            <Select onChange={x=>setSelectedColumns([x.toString(), ...selectedColumns].unique())} mode="multiple">
-              {columns.map(x => <Option value={x} >{x}</Option>)}
-            </Select>
-          </FormItem>
         </Card>
       </Col>
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%", minHeight: "400px" }}>
           <pre style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
             <code style={{}}>
-              {reactElementToJSXString(Chart())}
+              {
+                //{reactElementToJSXString(Chart())}
+              }
+              TODO: source for component
             </code>
           </pre>
         </Card>

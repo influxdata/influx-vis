@@ -1,32 +1,29 @@
 import React from "react";
-import { Table as InfluxTable, newTable, fromFlux } from '@influxdata/giraffe'
+import { newTable, fromFlux } from '@influxdata/giraffe'
 import { useState } from "react";
-import { Button, Form, Input, InputNumber, List, Select } from "antd";
+import { Button, Form, InputNumber, Select } from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import { range } from "../util/utils";
 import { Plot } from "@influxdata/giraffe";
 import { DEFAULT_TABLE_COLORS } from "@influxdata/giraffe";
-import { tableCSV } from "../util/csv";
 import TextArea from "antd/lib/input/TextArea";
 
-import * as csv01 from "../data/bandCSV";
-import * as csv02 from "../data/fluxCSV";
-import * as csv03 from "../data/mosaicCSV";
-import * as csv04 from "../data/tableGraph";
 import { Option } from "antd/lib/mentions";
 import { TableGraphLayerConfig } from "@influxdata/giraffe/dist/types";
 
-const csvs = [csv01, csv02, csv03, csv04].map(x => Object.entries(x)).flat()
+import csvs from "../data/giraffe";
+import { csvFromLines, randomLine } from "../data/utils";
 
-type TInfluxSourceProps = {
-  onTableChange: (table: InfluxTable) => void
-};
+import "../util/utils";
+
+export type NumericDataWithKeys = { [_time: number]: { [key: string]: number } };
 
 export const useInfluxSource = () => {
   const [csv, setCsv] = useState("");
   const [preset, setPreset] = useState("");
 
   const table = (() => {
+    // return newTable(0);
     try {
       return fromFlux(csv).table || newTable(0);
     } catch (e) {
@@ -34,6 +31,47 @@ export const useInfluxSource = () => {
     }
   })();
 
+  const time = table.getColumn("_time", "number") as number[] || [];
+  const values = table.getColumn("_value", "number") as number[] || [];
+  const fields = table.getColumn("_field", "string") as string[] || [];
+
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+
+  // todo: hashed
+  const data: NumericDataWithKeys = {};
+
+  const keysColumns = selectedColumns.map(x => table.getColumn(x,) as number[] | string[])
+  const getKey = (i: number) => {
+    const field = fields[i];
+
+    const keys = keysColumns
+      .map(x => x?.[i] || "")
+      .map(x => typeof x === "number" ? x.toString() : x)
+      .reduce((a, b) => `${a} ${b}`, "")
+      ;
+
+    return `${field}  ${keys}`;
+  };
+
+  if (time?.length)
+    time?.forEach((time, i) => {
+      const value = values[i];
+      const key = getKey(i);
+
+      const entry = data[time];
+      if (!entry)
+        data[time] = { [key]: value };
+      else
+        entry[key] = value;
+    });
+
+  // todo: don't calculate keys second time
+  const uniqueKeys = range(table.length || 0)
+    .map(getKey)
+    .uniqueStr()
+    ;
+
+  const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value" && x !== "_field")
 
   const tableVis =
     <div
@@ -67,6 +105,10 @@ export const useInfluxSource = () => {
     </div>
     ;
 
+  const [generateLines, setGenerateLines] = useState(5);
+  const [generatePoints, setGeneratePoints] = useState(1_000);
+  const [generateDensity, setGenerateDensity] = useState(1);
+
   const element: React.ReactElement = <>
     <Form
       labelCol={{ xs: 24, md: 8 }}
@@ -86,7 +128,29 @@ export const useInfluxSource = () => {
         </Select>
       </FormItem>
       <FormItem label={"CSV"} style={{ width: "100%", height: "100%" }}>
-        <TextArea onChange={x => { setPreset(""); setCsv(x.target.value); }} value={csv} rows={10} ></TextArea>
+        Could be trimmed
+        <TextArea onChange={x => { setPreset(""); setCsv(x.target.value); }} value={csv.split("\n").limit(100).join("\n")} rows={10} ></TextArea>
+      </FormItem>
+      <FormItem label={"Generate"}>
+        <Form layout="inline">
+          <FormItem>
+            <Button  onClick={()=>{
+              const csv = csvFromLines(randomLine({points:generatePoints, lines: generateLines, noise:true, density:generateDensity}))
+              setSelectedColumns(["line"]);
+              setCsv(csv);
+            }}>Generate</Button>
+          </FormItem>
+          <FormItem>
+            <InputNumber value={generatePoints} onChange={setGeneratePoints} />
+            <InputNumber value={generateLines} onChange={setGenerateLines} />
+            <InputNumber value={generateDensity} onChange={setGenerateDensity} />
+          </FormItem>
+        </Form>
+      </FormItem>
+      <FormItem label={"group by tags"}>
+        <Select onChange={x => setSelectedColumns([x.toString(), ...selectedColumns].uniqueStr())} mode="multiple">
+          {columns.map(x => <Option value={x} >{x}</Option>)}
+        </Select>
       </FormItem>
     </Form>
   </>;
@@ -96,6 +160,8 @@ export const useInfluxSource = () => {
     table,
     element,
     tableVis,
+    keys: uniqueKeys,
+    data,
   };
 };
 
