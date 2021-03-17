@@ -127,15 +127,26 @@ export const useInfluxSource = () => {
           )}
         </Select>
       </FormItem>
-      <FormItem label={"CSV"} style={{ width: "100%", height: "100%" }}>
-        Could be trimmed
+      <FormItem label={"CSV"} style={{ width: "100%", height: "100%", position: "relative" }}>
         <TextArea onChange={x => { setPreset(""); setCsv(x.target.value); }} value={csv.split("\n").limit(100).join("\n")} rows={10} ></TextArea>
+        <div style={{ position: "absolute", right: 4, bottom: 4, opacity: .9, background: "white", padding:4 }}>
+          Could be trimmed
+        </div>
+        <div style={{ position: "absolute", right: 2, top: 2, padding: 4, background: "white" }}>
+          <Button style={{marginRight:4}} onClick={async () => {
+            await navigator.clipboard.writeText(csv);
+          }}>Copy</Button>
+          <Button onClick={async () => {
+            const text = await navigator.clipboard.readText();
+            setCsv(text);
+          }}>Paste</Button>
+        </div>
       </FormItem>
       <FormItem label={"Generate"}>
         <Form layout="inline">
           <FormItem>
-            <Button  onClick={()=>{
-              const csv = csvFromLines(randomLine({points:generatePoints, lines: generateLines, noise:true, density:generateDensity}))
+            <Button onClick={() => {
+              const csv = csvFromLines(randomLine({ points: generatePoints, lines: generateLines, noise: true, density: generateDensity }))
               setSelectedColumns(["line"]);
               setCsv(csv);
             }}>Generate</Button>
