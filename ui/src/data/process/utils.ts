@@ -1,5 +1,5 @@
 import SimplexNoise from "simplex-noise";
-import { range } from "../util/utils";
+import { range } from "../../util/utils";
 
 
 // todo: date now
@@ -76,6 +76,6 @@ export const csvFromLines = (lines: (number | undefined)[][], step = 100) => {
 
   const csv = head + linesStr.reduce((a, b) => `${a}\n${b}`, "");
 
-  return csv
+  return csv;
 }
 

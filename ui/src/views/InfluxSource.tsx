@@ -12,17 +12,21 @@ import { Option } from "antd/lib/mentions";
 import { TableGraphLayerConfig } from "@influxdata/giraffe/dist/types";
 
 import csvs from "../data/giraffe";
-import { csvFromLines, randomLine } from "../data/utils";
 
 import "../util/utils";
+import { optimizeTable } from "../data/process/optimizeLine";
+import { csvFromLines, randomLine } from "../data/process/utils";
 
 export type NumericDataWithKeys = { [_time: number]: { [key: string]: number } };
+
+// todo: use @influxdata/influxdb-client instead of giraffe table
+// todo: connect to existing isntance of
 
 export const useInfluxSource = () => {
   const [csv, setCsv] = useState("");
   const [preset, setPreset] = useState("");
 
-  const table = (() => {
+  const _table = (() => {
     // return newTable(0);
     try {
       return fromFlux(csv).table || newTable(0);
@@ -31,18 +35,20 @@ export const useInfluxSource = () => {
     }
   })();
 
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(["_field"]);
+
+  // const table = optimizeTable({ table: _table, groupByCols: selectedColumns })
+
+  const table = _table;
+
   const time = table.getColumn("_time", "number") as number[] || [];
   const values = table.getColumn("_value", "number") as number[] || [];
-  const fields = table.getColumn("_field", "string") as string[] || [];
-
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
 
   // todo: hashed
   const data: NumericDataWithKeys = {};
 
   const keysColumns = selectedColumns.map(x => table.getColumn(x,) as number[] | string[])
   const getKey = (i: number) => {
-    const field = fields[i];
 
     const keys = keysColumns
       .map(x => x?.[i] || "")
@@ -50,7 +56,7 @@ export const useInfluxSource = () => {
       .reduce((a, b) => `${a} ${b}`, "")
       ;
 
-    return `${field}  ${keys}`;
+    return keys;
   };
 
   if (time?.length)
@@ -71,7 +77,7 @@ export const useInfluxSource = () => {
     .uniqueStr()
     ;
 
-  const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value" && x !== "_field")
+  const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value")
 
   const tableVis =
     <div
@@ -129,11 +135,11 @@ export const useInfluxSource = () => {
       </FormItem>
       <FormItem label={"CSV"} style={{ width: "100%", height: "100%", position: "relative" }}>
         <TextArea onChange={x => { setPreset(""); setCsv(x.target.value); }} value={csv.split("\n").limit(100).join("\n")} rows={10} ></TextArea>
-        <div style={{ position: "absolute", right: 4, bottom: 4, opacity: .9, background: "white", padding:4 }}>
+        <div style={{ position: "absolute", right: 24, bottom: 4, opacity: .9, background: "white", padding: 4 }}>
           Could be trimmed
         </div>
-        <div style={{ position: "absolute", right: 2, top: 2, padding: 4, background: "white" }}>
-          <Button style={{marginRight:4}} onClick={async () => {
+        <div style={{ position: "absolute", right: 24, top: 2, padding: 4, background: "white" }}>
+          <Button style={{ marginRight: 4 }} onClick={async () => {
             await navigator.clipboard.writeText(csv);
           }}>Copy</Button>
           <Button onClick={async () => {
@@ -147,7 +153,7 @@ export const useInfluxSource = () => {
           <FormItem>
             <Button onClick={() => {
               const csv = csvFromLines(randomLine({ points: generatePoints, lines: generateLines, noise: true, density: generateDensity }))
-              setSelectedColumns(["line"]);
+              setSelectedColumns(["_field", "line"]);
               setCsv(csv);
             }}>Generate</Button>
           </FormItem>

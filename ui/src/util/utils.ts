@@ -44,7 +44,6 @@ declare global {
   }
 }
 
-
 if (!Array.prototype.unique) {
   Array.prototype.unique = function <T>(this: T[]): T[] {
     return this.filter((x, i) => this.findIndex(y => y === x) === i);
@@ -61,3 +60,9 @@ if (!Array.prototype.limit) {
   }
 }
 
+export const sorting = {
+  number: {
+    ascending: (a: number, b: number) => a - b,
+    descending: (a: number, b: number) => b - a,
+  } as const,
+} as const;
