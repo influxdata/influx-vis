@@ -150,6 +150,15 @@ export const useInfluxSource = () => {
       </FormItem>
       <FormItem label={"Generate"}>
         <Form layout="inline">
+          <FormItem label={"points"}>
+            <InputNumber value={generatePoints} onChange={setGeneratePoints} />
+          </FormItem>
+          <FormItem label={"lines"}>
+            <InputNumber value={generateLines} onChange={setGenerateLines} />
+          </FormItem>
+          <FormItem label={"density [0,1]"}>
+            <InputNumber value={generateDensity} onChange={setGenerateDensity} />
+          </FormItem>
           <FormItem>
             <Button onClick={() => {
               const csv = csvFromLines(randomLine({ points: generatePoints, lines: generateLines, noise: true, density: generateDensity }))
@@ -157,15 +166,10 @@ export const useInfluxSource = () => {
               setCsv(csv);
             }}>Generate</Button>
           </FormItem>
-          <FormItem>
-            <InputNumber value={generatePoints} onChange={setGeneratePoints} />
-            <InputNumber value={generateLines} onChange={setGenerateLines} />
-            <InputNumber value={generateDensity} onChange={setGenerateDensity} />
-          </FormItem>
         </Form>
       </FormItem>
       <FormItem label={"group by tags"}>
-        <Select onChange={x => setSelectedColumns([x.toString(), ...selectedColumns].uniqueStr())} mode="multiple">
+        <Select value={selectedColumns} onChange={x => setSelectedColumns(x.uniqueStr())} mode="multiple">
           {columns.map(x => <Option value={x} >{x}</Option>)}
         </Select>
       </FormItem>

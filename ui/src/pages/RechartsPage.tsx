@@ -80,16 +80,19 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
       </Col>
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%", minHeight: "400px" }}>
-          <pre style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
-            <code style={{}}>
-              <SyntaxHighlighter language="jsx" style={docco}>
+          <div style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
+              <SyntaxHighlighter language="jsx" style={docco} >
                 {`\
-const { element: influxSourceElement, table, tableVis, keys, data } = useInfluxSource();
+// normalized data
+const { 
+  element: influxSourceElement, table, tableVis, keys, data 
+} = useInfluxSource();
 
+// change normalized data for usage in recharts
 const rechartsData = Object.entries(data)
   .map(([key, values]) => ({ ...values, _time: +key }))
 
-<LineChart data={rechartsData}>
+return (<LineChart data={rechartsData}>
   <XAxis
     dataKey="_time"
     tickFormatter={(t) => {
@@ -106,7 +109,8 @@ const rechartsData = Object.entries(data)
         dataKey={x}
         type="natural"
         dot={false}
-        stroke={\`#\${i % 2 == 0 ? 'ff' : '00'}\${i % 3 === 1 ? 'aa' : '00'
+        stroke={\`#\${i % 2 == 0 ? 'ff' : '00'}\${
+          i % 3 === 1 ? 'aa' : '00'
           }\${i % 3 === 0 ? 'ff' : '00'}\`}
       />
     )
@@ -118,11 +122,10 @@ const rechartsData = Object.entries(data)
   />
   <Brush />
   <Legend />
-</LineChart>
+</LineChart>)
 `}
               </SyntaxHighlighter>
-            </code>
-          </pre>
+          </div>
         </Card>
       </Col>
     </Row>
