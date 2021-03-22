@@ -48,7 +48,7 @@ export const randomLine = (opts: randomLineOptions): (number | undefined)[][] =>
 }
 
 
-export const csvFromLines = (lines: (number | undefined)[][], step = 100) => {
+export const csvFromLines = (lines: (number | undefined)[][], step = 1000) => {
   const head = `\
 #group,false,false,true,true,false,false,true,true
 #datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,long
