@@ -59,18 +59,18 @@ export const csvFromLines = (lines: (number | undefined)[][], step = 1000) => {
 
   const linesStr: string[] = [];
 
-  const timestampStart = Date.now() - maxLineLength * step;
+  const timestampStart = Date.now() - maxLineLength * step - step;
   for (let li = 0; li < lines.length; li++) {
     const line = lines[li];
     let timestamp = timestampStart;
     for (let i = 0; i < maxLineLength; i++) {
+      timestamp += step;
       const time = new Date(timestamp).toISOString();
       const value = line[i];
       if (typeof value !== "number") continue;
 
       const lineStr = `,,0,${time},${time},${time},${value},line,${li}`;
       linesStr.push(lineStr);
-      timestamp += step;
     }
   }
 
