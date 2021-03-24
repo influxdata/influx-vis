@@ -43,6 +43,7 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
               dataKey={x}
               type="natural"
               dot={false}
+              connectNulls={true}
               stroke={colorFromIndex(i)}
             />
           )

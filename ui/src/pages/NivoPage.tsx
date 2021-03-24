@@ -27,8 +27,8 @@ export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
   const nivoData = keys.map(key => ({
     id: key,
     data: Object.entries(data)
-      .filter(([_, values]) => values[key] !== undefined)
-      .map(([x, values]) => ({ x: +x, y: values[key] })),
+      .map(([x, values]) => ({ x: +x, y: values[key] ?? null }))
+    ,
   }))
 
   const [isCanvas, setIsCanvas] = useState(true);
@@ -112,8 +112,7 @@ export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
 const nivoData = keys.map(key => ({
   id: key,
   data: Object.entries(data)
-    .filter(([_, values]) => values[key] !== undefined)
-    .map(([x, values]) => ({ x: +x, y: values[key] })),
+    .map(([x, values]) => ({ x: +x, y: values[key] ?? null })),
 }))`}
             </SyntaxHighlighter>
 
