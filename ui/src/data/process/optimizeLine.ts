@@ -1,5 +1,5 @@
 import { newTable, Table } from "@influxdata/giraffe";
-import { range, sorting } from "../../util/utils";
+import { range, sorting, sortWithInverse, zip } from "../../util/utils";
 
 
 export type optimizeTableParams = {
@@ -43,6 +43,7 @@ const giraffeTableKeepRows = (t: Table, keep: boolean[]) => {
   const columnFluxTypes = columnKeys.map(x => t.getOriginalColumnType(x)!)
   const columnTypes = columnKeys.map(x => t.getColumnType(x)!)
   const columnNames = columnKeys.map(x => t.getColumnName(x)!)
+
   const columns = columnKeys.map(x => t.getColumn(x)!);
 
   const newColumns = columns.map(x => [] as any[]);
@@ -55,9 +56,9 @@ const giraffeTableKeepRows = (t: Table, keep: boolean[]) => {
     })
   }
 
-  const table = newTable(keep.filter(x => x).length);
+  let table = newTable(keep.filter(x => x).length);
   columnKeys.forEach((key, coli) => {
-    table.addColumn(key, columnFluxTypes[coli], columnTypes[coli], newColumns[coli], columnNames[coli]);
+    table = table.addColumn(key, columnFluxTypes[coli], columnTypes[coli], newColumns[coli], columnNames[coli]);
   })
   return table;
 }
@@ -65,7 +66,7 @@ const giraffeTableKeepRows = (t: Table, keep: boolean[]) => {
 export const optimizeTable = (params: optimizeTableParams): Table => {
   const { groupByCols, table, targetPointsPerLine } = { ...defaults, ...params };
 
-  if (table.length <= targetPointsPerLine) return table;
+  // if (table.length <= targetPointsPerLine) return table;
 
   const time = table.getColumn("_time", "number") as number[] || [];
   const values = table.getColumn("_value", "number") as number[] || [];
@@ -89,57 +90,75 @@ export const optimizeTable = (params: optimizeTableParams): Table => {
   const keep = range(table.length).map(() => false);
 
   grouped.forEach(({ indexes, key }) => {
-    if (indexes.length <= targetPointsPerLine) {
-      indexes.forEach(x => keep[x] = true);
-      return;
-    }
-    // scoped use local indexing - inverse mapping is mapping from current scope into table
-    const { timeScoped, inverseMapping } = (() => {
-      const timeScoped = indexes.map(i => ({ time: time[i], i }));
-      timeScoped.sort(({ time: a }, { time: b }) => sorting.number.ascending(a, b));
-      return { timeScoped: timeScoped.map(({ time }) => time), inverseMapping: timeScoped.map(({ i }) => i) };
-    })();
-    const valuesScoped = inverseMapping.map((i) => values[i]);
+    const scopedTime = indexes.map(i => time[i]);
+    const scopedValues = indexes.map(i => values[i]);
 
-    const distances = range(timeScoped.length).map(() => 0);
+    const { sorted: scopedTimeSorted, inverse, same } = sortWithInverse(scopedTime, sorting.number.ascending);
+    const scopedValuesSorted = same(scopedValues);
+    const lineScopedSorted = zip(scopedTimeSorted, scopedValuesSorted).map(([x, y]) => ({ x, y }));
 
-    const calculateDistances = (i0: number, i1: number) => {
-      distances[i0] = -Infinity;
-      distances[i1] = -Infinity;
-      const x1 = valuesScoped[i0];
-      const y1 = timeScoped[i0];
-      const x2 = valuesScoped[i1];
-      const y2 = timeScoped[i1];
-      const dist = distFromLine.bind(undefined, x1, y1, x2, y2);
+    const keepScopedSorted = optimizeLine({ line: lineScopedSorted, targetPoints: targetPointsPerLine });
+    const keepScoped = inverse(keepScopedSorted);
 
-      for (let i = i0 + 1; i < i1; i++) {
-        distances[i] = dist(valuesScoped[i], timeScoped[i]);
-      }
-    }
+    indexes.forEach((i, ii)=> keep[i] = keepScoped[ii])
+    // keepScoped.forEach((x, i) => keep[indexes[i]] = x);
+  });
 
-    // we always keep side points
-    keep[inverseMapping[0]] = true;
-    keep[inverseMapping[inverseMapping.length - 1]] = true;
-    calculateDistances(inverseMapping[0], inverseMapping[inverseMapping.length - 1])
-
-    for (let i = 0; i < targetPointsPerLine; i++) {
-      // todo: faster way, save index during searching for max
-      const maxDist = Math.max(...distances);
-      const maxDisti = distances.findIndex(x => x === maxDist);
-
-      keep[inverseMapping[maxDisti]] = true;
-      let ii = maxDisti;
-      // find left point that we keep from max dist point
-      while (!keep[inverseMapping[--ii]]) { }
-      calculateDistances(ii, maxDisti);
-      // find right point that we keep from max dist point
-      while (!keep[inverseMapping[++ii]]) { }
-      calculateDistances(maxDisti, ii);
-    }
-  })
   const newTable = giraffeTableKeepRows(table, keep);
   return newTable;
 };
 
+type optimizeLineProps = {
+  line: { x: number, y: number }[],
+  targetPoints: number,
+}
+/** 
+ * for given line, returns which points to keep
+ */
+export const optimizeLine = (props: optimizeLineProps): boolean[] => {
+  const { line, targetPoints } = { ...props };
+  if (targetPoints >= line.length)
+    return line.map(() => true);
+
+  const keep = line.map(() => false);
+  const distances = line.map(() => -Infinity)
+
+  const calculateDistBetweenI = (i0: number, i1: number) => {
+    distances[i0] = -Infinity;
+    distances[i1] = -Infinity;
+    const [p0, p1] = [line[i0], line[i1]];
+
+    const dist = distFromLine.bind(undefined, p0.x, p0.y, p1.x, p1.y);
+
+    for (let i = i0 + 1; i < i1; i++) {
+      const p = line[i];
+      distances[i] = dist(p.x, p.y);
+    }
+  }
+
+  // always keep side points
+  keep[0] = true;
+  keep[keep.length - 1] = true;
+
+  calculateDistBetweenI(0, keep.length - 1)
+
+  for (let i = 0; i < targetPoints; i++) {
+    // todo: faster way, save index during searching for max
+    const maxDist = Math.max(...distances);
+    const maxDisti = distances.findIndex(x => x === maxDist);
+
+    keep[maxDisti] = true;
+    // find left point that we keep from max dist point
+    let iLower = maxDisti;
+    while (!keep[--iLower]) { }
+    calculateDistBetweenI(iLower, maxDisti);
+    // find right point that we keep from max dist point
+    let iUpper = maxDisti;
+    while (!keep[++iUpper]) { }
+    calculateDistBetweenI(maxDisti, iUpper);
+  }
+
+  return keep;
+}
 
 

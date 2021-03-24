@@ -1,15 +1,11 @@
-import { Card, Col, Row, Select } from "antd";
+import { Card, Col, Row } from "antd";
 import React from "react";
-import { useState } from "react";
-import reactElementToJSXString from "react-element-to-jsx-string";
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Brush, Legend, Tooltip } from "recharts";
-import { useInfluxSource } from "../views/InfluxSource";
+import { normalizedDataFromTable, useInfluxSource } from "../views/InfluxSource";
 import "../util/utils";
-import { Option } from "antd/lib/mentions";
-import FormItem from "antd/lib/form/FormItem";
-import { range } from "../util/utils";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
 type TRechartsPageProps = {
 
 };
@@ -18,14 +14,18 @@ const formatDate = (d: Date) => {
   return `${d.getHours()}:${d.getMinutes()}`;
 }
 
+const colorFromIndex = (i: number) => `#${i % 2 === 0 ? 'ff' : '00'}${i % 3 === 1 ? 'aa' : '00'
+  }${i % 3 === 0 ? 'ff' : '00'}`;
+
 export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
 
-  const { element: influxSourceElement, table, tableVis, keys, data } = useInfluxSource();
+  const { element: influxSourceElement, table, tableVis, selectedColumns } = useInfluxSource();
+  const { data, keys } = normalizedDataFromTable(table, selectedColumns);
 
   const rechartsData = Object.entries(data).map(([key, values]) => ({ ...values, _time: +key }))
 
   const Chart = () =>
-    <ResponsiveContainer height="100%" minHeight="200px">
+    <ResponsiveContainer height="100%" minHeight="300px">
       <LineChart data={rechartsData}>
         <XAxis
           dataKey="_time"
@@ -43,8 +43,7 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
               dataKey={x}
               type="natural"
               dot={false}
-              stroke={`#${i % 2 == 0 ? 'ff' : '00'}${i % 3 === 1 ? 'aa' : '00'
-                }${i % 3 === 0 ? 'ff' : '00'}`}
+              stroke={colorFromIndex(i)}
             />
           )
         }
@@ -81,8 +80,8 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%", minHeight: "400px" }}>
           <div style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
-              <SyntaxHighlighter language="jsx" style={docco} >
-                {`\
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`\
 // normalized data
 const { 
   element: influxSourceElement, table, tableVis, keys, data 
@@ -124,7 +123,7 @@ return (<LineChart data={rechartsData}>
   <Legend />
 </LineChart>)
 `}
-              </SyntaxHighlighter>
+            </SyntaxHighlighter>
           </div>
         </Card>
       </Col>

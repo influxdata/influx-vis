@@ -16,11 +16,52 @@ import csvs from "../data/giraffe";
 import "../util/utils";
 import { optimizeTable } from "../data/process/optimizeLine";
 import { csvFromLines, randomLine } from "../data/process/utils";
+import { Table } from "@influxdata/giraffe";
 
 export type NumericDataWithKeys = { [_time: number]: { [key: string]: number } };
 
 // todo: use @influxdata/influxdb-client instead of giraffe table
 // todo: connect to existing isntance of
+
+export const normalizedDataFromTable = (table: Table, groupByColumns: string[]) => {
+  // todo: hashed
+  const data: NumericDataWithKeys = {};
+
+  const time = table.getColumn("_time", "number") as number[] || [];
+  const values = table.getColumn("_value", "number") as number[] || [];
+
+  const keysColumns = groupByColumns.map(x => table.getColumn(x,) as number[] | string[])
+  const getKey = (i: number) => {
+    const keys = keysColumns
+      .map(x => x?.[i] || "")
+      .map(x => typeof x === "number" ? x.toString() : x)
+      .reduce((a, b) => `${a} ${b}`, "")
+      ;
+
+    return keys;
+  };
+
+  const keysArr = range(table.length || 0)
+    .map(getKey)
+    ;
+
+  const keys = keysArr.uniqueStr();
+
+  // todo: don't calculate keys second time
+  if (time?.length)
+    time?.forEach((time, i) => {
+      const value = values[i];
+      const key = keysArr[i];
+
+      const entry = data[time];
+      if (!entry)
+        data[time] = { [key]: value };
+      else
+        entry[key] = value;
+    });
+
+  return { data, keys };
+}
 
 export const useInfluxSource = () => {
   const [csv, setCsv] = useState("");
@@ -40,42 +81,6 @@ export const useInfluxSource = () => {
   // const table = optimizeTable({ table: _table, groupByCols: selectedColumns })
 
   const table = _table;
-
-  const time = table.getColumn("_time", "number") as number[] || [];
-  const values = table.getColumn("_value", "number") as number[] || [];
-
-  // todo: hashed
-  const data: NumericDataWithKeys = {};
-
-  const keysColumns = selectedColumns.map(x => table.getColumn(x,) as number[] | string[])
-  const getKey = (i: number) => {
-
-    const keys = keysColumns
-      .map(x => x?.[i] || "")
-      .map(x => typeof x === "number" ? x.toString() : x)
-      .reduce((a, b) => `${a} ${b}`, "")
-      ;
-
-    return keys;
-  };
-
-  if (time?.length)
-    time?.forEach((time, i) => {
-      const value = values[i];
-      const key = getKey(i);
-
-      const entry = data[time];
-      if (!entry)
-        data[time] = { [key]: value };
-      else
-        entry[key] = value;
-    });
-
-  // todo: don't calculate keys second time
-  const uniqueKeys = range(table.length || 0)
-    .map(getKey)
-    .uniqueStr()
-    ;
 
   const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value")
 
@@ -115,7 +120,7 @@ export const useInfluxSource = () => {
   const [generatePoints, setGeneratePoints] = useState(1_000);
   const [generateDensity, setGenerateDensity] = useState(1);
 
-  const element: React.ReactElement = <>
+  const element: React.ReactElement = (<>
     <Form
       labelCol={{ xs: 24, md: 8 }}
       wrapperCol={{ xs: 24, md: 8 }}
@@ -174,15 +179,15 @@ export const useInfluxSource = () => {
         </Select>
       </FormItem>
     </Form>
-  </>;
+  </>)
+    ;
 
 
   return {
     table,
     element,
     tableVis,
-    keys: uniqueKeys,
-    data,
+    selectedColumns,
   };
 };
 

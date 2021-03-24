@@ -44,6 +44,7 @@ declare global {
   }
 }
 
+// todo: shouldn't extend native objects 
 if (!Array.prototype.unique) {
   Array.prototype.unique = function <T>(this: T[]): T[] {
     return this.filter((x, i) => this.findIndex(y => y === x) === i);
@@ -66,3 +67,29 @@ export const sorting = {
     descending: (a: number, b: number) => b - a,
   } as const,
 } as const;
+
+/**
+ * Returns sorted array with given sorter. 
+ * Inverse function witch apply (redo sorting) on sorted array and 'same' function which swap items same way as sorting on original array.
+ */
+export const sortWithInverse = <T>(arr: T[], sorter: Parameters<(T[])["sort"]>[0]): { sorted: T[], inverse: <TT>(arr: TT[]) => TT[], same: <TT>(arr: TT[]) => TT[] } => {
+  const withIndex = arr.map((x, i) => [x, i] as const);
+  withIndex.sort(sorter && ((a, b) => sorter(a[0], b[0])));
+  const inverseIndex = withIndex.map(([_, i]) => i);
+  const inverse = <TT>(arr: TT[]) => {
+    if (arr.length !== inverseIndex.length)
+      throw new Error("cannot reverse mapping array with different lengths");
+    const newArr: TT[] = range(arr.length) as any;
+    arr.forEach((x, i) => {
+      newArr[inverseIndex[i]] = x;
+    });
+    return newArr;
+  }
+  const same = <TT>(arr: TT[]) => {
+    if (arr.length !== inverseIndex.length)
+      throw new Error("cannot reverse mapping array with different lengths");
+    return inverseIndex.map(i=>arr[i]);
+  }
+  const sorted = withIndex.map(([x]) => x);
+  return { sorted, inverse, same };
+}

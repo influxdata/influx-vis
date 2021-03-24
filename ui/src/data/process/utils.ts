@@ -39,10 +39,10 @@ export const randomLine = (opts: randomLineOptions): (number | undefined)[][] =>
   else {
     let y = (Math.random() - .5) * points * .02;
     return range(lines).map(() =>
-      range(points).map(() => (
-        y += Math.random() - .5,
-        Math.random() < density ? y : undefined
-      ))
+      range(points).map(() => {
+        y += Math.random() - .5;
+        return Math.random() < density ? y : undefined;
+      })
     );
   }
 }

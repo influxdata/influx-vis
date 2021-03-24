@@ -12,6 +12,7 @@ import { Layout, Menu } from 'antd'
 import { Header } from "antd/lib/layout/layout"
 import { HomePage } from "./pages/HomePage"
 import { RechartsPage } from "./pages/RechartsPage"
+import { NivoPage } from "./pages/NivoPage"
 
 const pages: {
   url: string,
@@ -20,7 +21,7 @@ const pages: {
 }[] = [
     { url: "/home", label: "Home", page: HomePage },
     { url: "/recharts", label: "Recharts", page: RechartsPage },
-    { url: "/nivo", label: "Nivo", page: () => <></> },
+    { url: "/nivo", label: "Nivo", page: NivoPage },
   ];
 
 
