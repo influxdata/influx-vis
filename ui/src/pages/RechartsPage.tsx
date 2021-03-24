@@ -80,18 +80,21 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%", minHeight: "400px" }}>
           <div style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
+            Normalize data
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`const { data, keys } = normalizedDataFromTable(table, groupByCols);`}
+            </SyntaxHighlighter>
+
+            Modify normalized data for usage in recharts
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`const rechartsData = Object.entries(data)
+  .map(([key, values]) => ({ ...values, _time: +key }))`}
+            </SyntaxHighlighter>
+
+            Render recharts line component
             <SyntaxHighlighter language="jsx" style={docco} >
               {`\
-// normalized data
-const { 
-  element: influxSourceElement, table, tableVis, keys, data 
-} = useInfluxSource();
-
-// change normalized data for usage in recharts
-const rechartsData = Object.entries(data)
-  .map(([key, values]) => ({ ...values, _time: +key }))
-
-return (<LineChart data={rechartsData}>
+<LineChart data={rechartsData}>
   <XAxis
     dataKey="_time"
     tickFormatter={(t) => {
@@ -121,7 +124,7 @@ return (<LineChart data={rechartsData}>
   />
   <Brush />
   <Legend />
-</LineChart>)
+</LineChart>
 `}
             </SyntaxHighlighter>
           </div>

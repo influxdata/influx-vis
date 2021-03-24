@@ -21,6 +21,7 @@ const formatDate = (d: any): string => {
 export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
 
   const { element: influxSourceElement, table, tableVis, selectedColumns } = useInfluxSource();
+
   const { data, keys } = normalizedDataFromTable(table, selectedColumns);
 
   const nivoData = keys.map(key => ({
@@ -36,6 +37,29 @@ export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
 
   const divRef = useRef<HTMLDivElement>(undefined!);
 
+  const nivoLineDefaults: Omit<ResponsiveLine["props"], "data"> = {
+    margin: { top: 50, right: 50, bottom: 110, left: 60 },
+    xScale: { type: "linear", min: "auto", max: "auto" },
+    yScale: { type: "linear", min: "auto", },
+    enableGridX: false,
+    enableGridY: false,
+    enablePoints: false,
+    enableSlices: "x",
+    axisBottom: {
+      orient: 'bottom',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 40,
+      format: (x) => formatDate(x),
+    },
+    axisLeft: {
+      orient: 'left',
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+    },
+  };
+
   const Chart = () => (
     <>
       <Switch
@@ -46,29 +70,7 @@ export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
       <div style={{ height: "300px", width: "100%" }}>
         <LineComponent
           data={nivoData}
-
-          margin={{ top: 50, right: 50, bottom: 110, left: 60 }}
-          // yFormat=" >-.2f"
-          xScale={{ type: "linear", min: "auto", max: "auto" }}
-          yScale={{ type: "linear", min: "auto", }}
-          enableGridX={false}
-          enableGridY={false}
-          enablePoints={false}
-          enableSlices={"x"}
-          // isInteractive={false}
-          axisBottom={{
-            orient: 'bottom',
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 40,
-            format: (x) => formatDate(x),
-          }}
-          axisLeft={{
-            orient: 'left',
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-          }}
+          {...nivoLineDefaults}
         />
       </div>
     </>)
@@ -99,8 +101,58 @@ export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
       <Col xs={24} xl={8}>
         <Card style={{ height: "100%", minHeight: "400px" }}>
           <div style={{ overflow: "auto", position: "absolute", height: "calc(100% - (24px * 2))", width: "calc(100% - (24px * 2))" }}>
+            Normalize data
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`const { data, keys } = normalizedDataFromTable(table, groupByCols);`}
+            </SyntaxHighlighter>
+
+            Modify normalized data for usage in nivo
             <SyntaxHighlighter language="jsx" style={docco} >
               {`\
+const nivoData = keys.map(key => ({
+  id: key,
+  data: Object.entries(data)
+    .filter(([_, values]) => values[key] !== undefined)
+    .map(([x, values]) => ({ x: +x, y: values[key] })),
+}))`}
+            </SyntaxHighlighter>
+
+            Create recommended defaults for nivo line
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`\
+const nivoLineDefaults: Omit<ResponsiveLine["props"], "data"> = {
+  margin: { top: 50, right: 50, bottom: 110, left: 60 },
+  xScale: { type: "linear", min: "auto", max: "auto" },
+  yScale: { type: "linear", min: "auto", },
+  enableGridX: false,
+  enableGridY: false,
+  enablePoints: false,
+  enableSlices: "x",
+  axisBottom: {
+    orient: 'bottom',
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 40,
+    format: (x) => formatDate(x),
+  },
+  axisLeft: {
+    orient: 'left',
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+  },
+};
+`}
+            </SyntaxHighlighter>
+            Draw nivo line (for canvas use ResponsiveLineCanvas)
+            <SyntaxHighlighter language="jsx" style={docco} >
+              {`\
+<div style={{ height: "300px", width: "100%" }}>
+  <ResponsiveLine
+    data={nivoData}
+    {...nivoLineDefaults}
+  />
+</div>
 `}
             </SyntaxHighlighter>
           </div>
