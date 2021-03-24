@@ -1,7 +1,7 @@
 import React from "react";
 import { newTable, fromFlux } from '@influxdata/giraffe'
 import { useState } from "react";
-import { Button, Form, InputNumber, Select } from "antd";
+import { Button, Form, Input, InputNumber, Select, Switch } from "antd";
 import FormItem from "antd/lib/form/FormItem";
 import { range } from "../util/utils";
 import { Plot } from "@influxdata/giraffe";
@@ -63,6 +63,40 @@ export const normalizedDataFromTable = (table: Table, groupByColumns: string[]) 
   return { data, keys };
 }
 
+
+const useRandomGenerator = (onGenerate: (line: (number | undefined)[][]) => void) => {
+
+  const [lines, setLines] = useState(5);
+  const [points, setPoints] = useState(1_000);
+  const [density, setDensity] = useState(1);
+  const [noise, setNoise] = useState(true);
+
+  const Component = <Form layout="inline">
+    <FormItem label={"points"}>
+      <InputNumber value={points} onChange={setPoints} />
+    </FormItem>
+    <FormItem label={"lines"}>
+      <InputNumber value={lines} onChange={setLines} />
+    </FormItem>
+    <FormItem label={"density [0,1]"}>
+      <InputNumber value={density} onChange={setDensity} />
+    </FormItem>
+    <FormItem label={"use noise"}>
+      <Switch checked={noise} onChange={setNoise} />
+    </FormItem>
+    <FormItem>
+      <Button onClick={() => {
+        const line = randomLine({ points, lines, noise, density });
+        onGenerate(line);
+      }}>Generate</Button>
+    </FormItem>
+  </Form>;
+
+  return { Component, };
+
+}
+
+
 export const useInfluxSource = () => {
   const [csv, setCsv] = useState("");
   const [preset, setPreset] = useState("");
@@ -116,9 +150,11 @@ export const useInfluxSource = () => {
     </div>
     ;
 
-  const [generateLines, setGenerateLines] = useState(5);
-  const [generatePoints, setGeneratePoints] = useState(1_000);
-  const [generateDensity, setGenerateDensity] = useState(1);
+  const { Component: generator } = useRandomGenerator((line) => {
+    const csv = csvFromLines(line);
+    setSelectedColumns(["_field", "line"]);
+    setCsv(csv);
+  });
 
   const element: React.ReactElement = (<>
     <Form
@@ -154,24 +190,7 @@ export const useInfluxSource = () => {
         </div>
       </FormItem>
       <FormItem label={"Generate"}>
-        <Form layout="inline">
-          <FormItem label={"points"}>
-            <InputNumber value={generatePoints} onChange={setGeneratePoints} />
-          </FormItem>
-          <FormItem label={"lines"}>
-            <InputNumber value={generateLines} onChange={setGenerateLines} />
-          </FormItem>
-          <FormItem label={"density [0,1]"}>
-            <InputNumber value={generateDensity} onChange={setGenerateDensity} />
-          </FormItem>
-          <FormItem>
-            <Button onClick={() => {
-              const csv = csvFromLines(randomLine({ points: generatePoints, lines: generateLines, noise: true, density: generateDensity }))
-              setSelectedColumns(["_field", "line"]);
-              setCsv(csv);
-            }}>Generate</Button>
-          </FormItem>
-        </Form>
+        {generator}
       </FormItem>
       <FormItem label={"group by tags"}>
         <Select value={selectedColumns} onChange={x => setSelectedColumns(x.uniqueStr())} mode="multiple">
@@ -190,4 +209,5 @@ export const useInfluxSource = () => {
     selectedColumns,
   };
 };
+
 
