@@ -1,7 +1,5 @@
-import { Button, Card, Col, PageHeader, Row, Slider } from "antd";
-import React, { useEffect, useRef, useState } from "react";
-import { randomLine } from "../data/process/utils";
-import { range, zip } from "../util/utils";
+import { Card, Col, PageHeader, Row } from "antd";
+import React from "react";
 import { SimplificationDemo } from "../views/SimplificationDemo";
 
 const bestPracticesText = `\
@@ -33,8 +31,7 @@ type TBestPracticePageProps = {
 };
 
 export const BestPracticePage: React.FC<TBestPracticePageProps> = (props) => {
-  const { } = props;
-
+  // const { } = props;
 
   return <>
     <PageHeader

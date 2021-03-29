@@ -24,6 +24,7 @@ const pages: {
     { url: "/recharts", label: "Recharts", page: RechartsPage },
     { url: "/nivo", label: "Nivo", page: NivoPage },
     { url: "/practices", label: "Best practice", page: BestPracticePage },
+    // TODO: https://perspective.finos.org/
   ];
 
 
@@ -31,13 +32,11 @@ const App: FunctionComponent<RouteComponentProps> = (props) => {
   return (<>
     <div className="App">
       <Layout style={{ height: '100vh' }}>
-        <Header className="header" style={{ justifyContent: "center" }}>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[props.location.pathname]}>
+        <Header className="header">
+          <Menu theme="dark" mode="horizontal" selectedKeys={[props.location.pathname]}>
             {pages.map(({ label, url }) =>
               <Menu.Item key={url}>
-                <NavLink to={url}>
-                  {label}
-                </NavLink>
+                <NavLink to={url}>{label}</NavLink>
               </Menu.Item>
             )}
           </Menu>
@@ -48,8 +47,6 @@ const App: FunctionComponent<RouteComponentProps> = (props) => {
             {pages.map(({ url, page }) => <Route exact path={url} component={page} />)}
           </SwitchRouter>
         </Layout.Content>
-        <Layout>
-        </Layout>
       </Layout>
     </div>
   </>)

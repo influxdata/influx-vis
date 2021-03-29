@@ -32,6 +32,9 @@ export const zip = <A, B>(arr1: A[], arr2: B[]): [A, B][] => {
   return arr1.map((k, i) => [k, arr2[i]]);
 };
 
+/** returns array with neighbour elements */
+export const pairs = <T,>(arr: T[]) => zip(arr.slice(1), arr.slice(0, -1));
+
 declare global {
   interface Array<T> {
     unique(): Array<T>;
@@ -46,9 +49,11 @@ declare global {
 
 // todo: shouldn't extend native objects 
 if (!Array.prototype.unique) {
+  // eslint-disable-next-line no-extend-native
   Array.prototype.unique = function <T>(this: T[]): T[] {
     return this.filter((x, i) => this.findIndex(y => y === x) === i);
   }
+  // eslint-disable-next-line no-extend-native
   Array.prototype.uniqueStr = function (this: string[]): string[] {
     const obj: { [key: string]: true } = {};
     this.forEach(x => obj[x] = true);
@@ -56,6 +61,7 @@ if (!Array.prototype.unique) {
   }
 }
 if (!Array.prototype.limit) {
+  // eslint-disable-next-line no-extend-native
   Array.prototype.limit = function <T>(this: T[], entries: number) {
     return this.filter((_, i) => i < entries);
   }

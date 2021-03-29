@@ -1,5 +1,5 @@
 import SimplexNoise from "simplex-noise";
-import { range } from "../../util/utils";
+import { range } from "../../util";
 
 
 // todo: date now

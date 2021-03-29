@@ -1,11 +1,7 @@
 import { Card } from "antd";
 import React from "react";
 
-type THomePageProps = {
-
-};
-
-export const HomePage: React.FC<THomePageProps> = ({ }) => {
+export const HomePage: React.FC = () => {
 
   return <>
     <Card title="Example project for visualisation with influxDB backend">

@@ -2,13 +2,9 @@ import { Card, Col, Row } from "antd";
 import React from "react";
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Line, Brush, Legend, Tooltip } from "recharts";
 import { normalizedDataFromTable, useInfluxSource } from "../views/InfluxSource";
-import "../util/utils";
+import "../util";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-
-type TRechartsPageProps = {
-
-};
 
 const formatDate = (d: Date) => {
   return `${d.getHours()}:${d.getMinutes()}`;
@@ -17,7 +13,7 @@ const formatDate = (d: Date) => {
 const colorFromIndex = (i: number) => `#${i % 2 === 0 ? 'ff' : '00'}${i % 3 === 1 ? 'aa' : '00'
   }${i % 3 === 0 ? 'ff' : '00'}`;
 
-export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
+export const RechartsPage: React.FC = () => {
 
   const { element: influxSourceElement, table, tableVis, selectedColumns } = useInfluxSource();
   const { data, keys } = normalizedDataFromTable(table, selectedColumns);
@@ -58,7 +54,6 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
       </LineChart>
     </ResponsiveContainer>
     ;
-  // TODO: https://perspective.finos.org/
   return <>
     <Row gutter={[16, 16]}>
       <Col xs={24}>

@@ -1,30 +1,25 @@
 import React from "react";
 import { newTable, fromFlux } from '@influxdata/giraffe'
 import { useState } from "react";
-import { Button, Form, Input, InputNumber, Select, Switch } from "antd";
+import { Button, Form, InputNumber, Select, Switch } from "antd";
 import FormItem from "antd/lib/form/FormItem";
-import { range } from "../util/utils";
+import { range } from "../util";
 import { Plot } from "@influxdata/giraffe";
 import { DEFAULT_TABLE_COLORS } from "@influxdata/giraffe";
 import TextArea from "antd/lib/input/TextArea";
 
 import { Option } from "antd/lib/mentions";
 import { TableGraphLayerConfig } from "@influxdata/giraffe/dist/types";
-
 import csvs from "../data/giraffe";
-
-import "../util/utils";
-import { optimizeTable } from "../data/process/optimizeLine";
+import "../util";
 import { csvFromLines, randomLine } from "../data/process/utils";
 import { Table } from "@influxdata/giraffe";
 
 export type NumericDataWithKeys = { [_time: number]: { [key: string]: number } };
 
 // todo: use @influxdata/influxdb-client instead of giraffe table
-// todo: connect to existing isntance of
 
 export const normalizedDataFromTable = (table: Table, groupByColumns: string[]) => {
-  // todo: hashed
   const data: NumericDataWithKeys = {};
 
   const time = table.getColumn("_time", "number") as number[] || [];
@@ -47,7 +42,6 @@ export const normalizedDataFromTable = (table: Table, groupByColumns: string[]) 
 
   const keys = keysArr.uniqueStr();
 
-  // todo: don't calculate keys second time
   if (time?.length)
     time?.forEach((time, i) => {
       const value = values[i];
@@ -65,7 +59,6 @@ export const normalizedDataFromTable = (table: Table, groupByColumns: string[]) 
 
 
 const useRandomGenerator = (onGenerate: (line: (number | undefined)[][]) => void) => {
-
   const [lines, setLines] = useState(5);
   const [points, setPoints] = useState(1_000);
   const [density, setDensity] = useState(1);
@@ -112,8 +105,7 @@ export const useInfluxSource = () => {
 
   const [selectedColumns, setSelectedColumns] = useState<string[]>(["_field"]);
 
-  // const table = optimizeTable({ table: _table, groupByCols: selectedColumns })
-
+  // todo: add optional simplification
   const table = _table;
 
   const columns = table.columnKeys.filter(x => x !== "_time" && x !== "_start" && x !== "_stop" && x !== "_value")

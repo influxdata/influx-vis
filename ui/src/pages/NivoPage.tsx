@@ -1,14 +1,10 @@
 import { Card, Col, Row, Switch } from "antd";
 import React, { Profiler, useRef, useState } from "react";
 import { normalizedDataFromTable, useInfluxSource } from "../views/InfluxSource";
-import "../util/utils";
+import "../util";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { ResponsiveLine, ResponsiveLineCanvas } from '@nivo/line';
-
-type TNivoPageProps = {
-
-};
 
 const formatDate = (d: any): string => {
   if (typeof d === "number")
@@ -18,8 +14,7 @@ const formatDate = (d: any): string => {
   return "";
 }
 
-export const NivoPage: React.FC<TNivoPageProps> = ({ }) => {
-
+export const NivoPage: React.FC<{}> = () => {
   const { element: influxSourceElement, table, tableVis, selectedColumns } = useInfluxSource();
 
   const { data, keys } = normalizedDataFromTable(table, selectedColumns);
