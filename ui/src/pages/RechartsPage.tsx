@@ -62,7 +62,7 @@ export const RechartsPage: React.FC<TRechartsPageProps> = ({ }) => {
   return <>
     <Row gutter={[16, 16]}>
       <Col xs={24}>
-        <Card style={{ backgroundColor: "black" }} >
+        <Card>
           {tableVis}
         </Card>
       </Col>

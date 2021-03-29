@@ -16,6 +16,8 @@ export const HomePage: React.FC<THomePageProps> = ({ }) => {
       Only not-pivoted data (values stored in "_value" column) are supported for now.
       <div />
       <strong>normalizedDataFromTable</strong> show proposed function for easier more "JavaScript-ish" working with incoming influx data. There should be only simple transformation needed after data normalization function.
+      <div />
+      Simplification algorithm presented on Best practice tab is <strong>not</strong> used for libraries (original data is used)
     </Card>
   </>;
 };

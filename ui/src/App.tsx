@@ -13,7 +13,7 @@ import { Header } from "antd/lib/layout/layout"
 import { HomePage } from "./pages/HomePage"
 import { RechartsPage } from "./pages/RechartsPage"
 import { NivoPage } from "./pages/NivoPage"
-import { SimplifyPage } from "./pages/SimplifyPage"
+import { BestPracticePage } from "./pages/BestPracticePage"
 
 const pages: {
   url: string,
@@ -23,12 +23,12 @@ const pages: {
     { url: "/home", label: "Home", page: HomePage },
     { url: "/recharts", label: "Recharts", page: RechartsPage },
     { url: "/nivo", label: "Nivo", page: NivoPage },
-    { url: "/simplify", label: "Simplify", page: SimplifyPage },
+    { url: "/practices", label: "Best practice", page: BestPracticePage },
   ];
 
 
 const App: FunctionComponent<RouteComponentProps> = (props) => {
-  return (
+  return (<>
     <div className="App">
       <Layout style={{ height: '100vh' }}>
         <Header className="header" style={{ justifyContent: "center" }}>
@@ -52,7 +52,7 @@ const App: FunctionComponent<RouteComponentProps> = (props) => {
         </Layout>
       </Layout>
     </div>
-  )
+  </>)
 }
 
 export default withRouter(App)

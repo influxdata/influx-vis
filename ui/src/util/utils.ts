@@ -61,11 +61,16 @@ if (!Array.prototype.limit) {
   }
 }
 
+type SorterFor<T> = NonNullable<Parameters<(T[])["sort"]>[0]>;
+
 export const sorting = {
   number: {
     ascending: (a: number, b: number) => a - b,
     descending: (a: number, b: number) => b - a,
   } as const,
+  keySelector: <T, T1>(selector: (obj: T) => T1, sorter: SorterFor<T1>): SorterFor<T> => {
+    return (a, b) => sorter(selector(a), selector(b));
+  },
 } as const;
 
 /**
@@ -88,7 +93,7 @@ export const sortWithInverse = <T>(arr: T[], sorter: Parameters<(T[])["sort"]>[0
   const same = <TT>(arr: TT[]) => {
     if (arr.length !== inverseIndex.length)
       throw new Error("cannot reverse mapping array with different lengths");
-    return inverseIndex.map(i=>arr[i]);
+    return inverseIndex.map(i => arr[i]);
   }
   const sorted = withIndex.map(([x]) => x);
   return { sorted, inverse, same };

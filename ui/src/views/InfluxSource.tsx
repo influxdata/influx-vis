@@ -123,6 +123,7 @@ export const useInfluxSource = () => {
       style={{
         width: 'calc(100%)',
         height: '200px',
+        filter: "invert(1)",
         // margin: '50px',
       }}
     >
