@@ -21,7 +21,7 @@ Figure 1: Nivo Chart Console, Line chart in canvas
 Figure 2: Line Simplification, A small fraction of points is enough to draw a line chart
 ![Recharts Detail Screenshot](./img/line-simplification.jpg)
 
-Figure 3: Recharts, SVG-based Line Chart Detail
+Figure 3: Recharts Example, SVG-based line chart detail
 ![Recharts Detail Screenshot](./img/recharts-detail.jpg)
 
 ## Quick Start
