@@ -62,17 +62,17 @@ export const BestPracticePage: React.FC<TBestPracticePageProps> = (props) => {
             <div>
               <ul>
                 <li>server</li>
-                  <ul>
-                    <li>low-end internet connection</li>
-                    <li>less data on user browser</li>
-                  </ul>
-                  <li>client</li>
-                  <ul>
-                    <li>all server side benefits mentioned above</li>
-                    <li>the algorithm can be added with no need to change queries</li>
-                    <li>don't add any more load on server</li>
-                    <li>all data remain on browser for other work, such as tables, or other analytic transformations</li>
-                  </ul>
+                <ul>
+                  <li>low-end internet connection</li>
+                  <li>less data on user browser</li>
+                </ul>
+                <li>client</li>
+                <ul>
+                  <li>all data sent to browser</li>
+                  <li>the algorithm can be added with no need to change queries</li>
+                  <li>don't add any more load on server</li>
+                  <li>all data remain on browser for other work, such as tables, or other analytic transformations</li>
+                </ul>
               </ul>
             </div>
 

@@ -8,14 +8,12 @@ export const HomePage: React.FC = () => {
 
       <div>
 
-        <p>This project is a <strong>playground for React front
-        developers</strong> that look for ways to visualize
-        <strong>InfluxDB</strong> query results by using the 3rd party
-        <strong>React</strong> components. For the <strong>dashboard</strong> use case, the
+        <p>This project is a <strong>playground for React front developers</strong> that look for 
+        ways to visualize <strong>InfluxDB</strong> query results by using the 3rd party <strong>React</strong> components.
+        For the <strong>dashboard</strong> use case, the
         Influxdata Giraffe project is not always an option. Alternatively, some
         of the most popular graph/visualization React-based data visualization
-        libraries are easy to use, too. Here we present <strong>Nivo</strong>
-        and <strong>Recharts</strong>. This is what you find at the Nivo and
+        libraries are easy to use, too. Here we present <strong>Nivo</strong> and <strong>Recharts</strong>. This is what you find at the Nivo and
         Recharts tabs.</p>
 
       </div>
@@ -25,7 +23,7 @@ export const HomePage: React.FC = () => {
         <p>To start, follow the procedure:</p>
         <ol>
           <li>Open one of the two tabs located in the header - <strong>Recharts</strong> or <strong>Nivo</strong>.</li>
-          <li>Select sample data from the dropdown labeled <strong>Preset'</strong>.</li>
+          <li>Select sample data from the dropdown labeled <strong>Preset</strong>.</li>
           <li>The line chart shows up. Its properties can be modified by UI controls in the middle.</li>
           <ul>
             <li>Copy paste your CSV, that you get from Influx DB.</li>
@@ -41,7 +39,7 @@ export const HomePage: React.FC = () => {
       <div>
 
         <p>To plot lines, SVG finds the performance limits first. This applies
-        to 50K points. In Nivo, there is the option to use a better-performing
+        above 50K points. In Nivo, there is the option to use a better-performing
         canvas. However, for dashboards, replacing <strong>SVG</strong> with <strong>canvas</strong> to render
         data faster is not the complete answer
         to acceptable performance. The canvas object starts hitting its limit
@@ -57,7 +55,7 @@ export const HomePage: React.FC = () => {
 
       <div>
 
-        <p>There is a function called <code>useInfluxSource</code>. It
+        <p>There is the function called <code>useInfluxSource</code>. It
         represents the InfluxDB source. The implementation provides data in the
         format of annotated CSVs that are served by the database. The
         application has also a built-in data generator of random CSV lines.</p>
