@@ -15,14 +15,14 @@ In this repository, we present **Nivo** and **Recharts**.
 
 ## Screenshots
 
-Figure 1: Nivo Chart Console, Line chart in canvas
-![Nivo Screenshot](./img/nivo-screenshot.jpg)
+Figure 1: Nivo Chart Console, 1. Line chart in canvas, data, code sample and table view
+![Nivo Chart Console](./img/nivo-screenshot.jpg)
 
-Figure 2: Line Simplification, A small fraction of points is enough to draw a line chart
-![Recharts Detail Screenshot](./img/line-simplification.jpg)
+Figure 2: Line Simplification Makes Performance, a small fraction of points is enough to draw a line chart
+![Line Simplification Makes Performance](./img/line-simplification.jpg)
 
 Figure 3: Recharts Example, SVG-based line chart detail
-![Recharts Detail Screenshot](./img/recharts-detail.jpg)
+![Recharts Example](./img/recharts-detail.jpg)
 
 ## Quick Start
 
