@@ -56,11 +56,6 @@ export const RechartsPage: React.FC = () => {
     ;
   return <>
     <Row gutter={[16, 16]}>
-      <Col xs={24}>
-        <Card>
-          {tableVis}
-        </Card>
-      </Col>
 
       <Col xs={24} xl={8} >
         <Card style={{ height: "100%" }}>
@@ -124,6 +119,11 @@ export const RechartsPage: React.FC = () => {
 `}
             </SyntaxHighlighter>
           </div>
+        </Card>
+      </Col>
+      <Col xs={24}>
+        <Card>
+          {tableVis}
         </Card>
       </Col>
     </Row>

@@ -65,16 +65,16 @@ const useRandomGenerator = (onGenerate: (line: (number | undefined)[][]) => void
   const [noise, setNoise] = useState(true);
 
   const Component = <Form layout="inline">
-    <FormItem label={"points"}>
+    <FormItem label={"Points"}>
       <InputNumber value={points} onChange={setPoints} />
     </FormItem>
-    <FormItem label={"lines"}>
+    <FormItem label={"Lines"}>
       <InputNumber value={lines} onChange={setLines} />
     </FormItem>
-    <FormItem label={"density [0,1]"}>
+    <FormItem label={"Density [0,1]"}>
       <InputNumber value={density} onChange={setDensity} />
     </FormItem>
-    <FormItem label={"use noise"}>
+    <FormItem label={"Use Noise"}>
       <Switch checked={noise} onChange={setNoise} />
     </FormItem>
     <FormItem>
@@ -185,7 +185,7 @@ export const useInfluxSource = () => {
       <FormItem label={"Generate"}>
         {generator}
       </FormItem>
-      <FormItem label={"group by tags"}>
+      <FormItem label={"Group by Tags"}>
         <Select value={selectedColumns} onChange={x => setSelectedColumns(x.uniqueStr())} mode="multiple">
           {columns.map(x => <Option value={x} >{x}</Option>)}
         </Select>

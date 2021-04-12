@@ -33,7 +33,7 @@ export const SimplificationDemo: React.FC<TSimplificationDemoProps> = (props) =>
 
   return <>
     <Card
-      title={"Demo of simplification algorithm"}
+      title={"Line simplification demo"}
       extra={<>
         points: <InputNumber value={pointsTotal} onChange={setPointsTotal} />
         <Button onClick={generateNew}>Generate new</Button>

@@ -74,15 +74,9 @@ export const NivoPage: React.FC<{}> = () => {
 
   return <>
     <Row gutter={[16, 16]}>
-      <Col xs={24}>
-        <Card>
-          {tableVis}
-        </Card>
-      </Col>
-
       <Col xs={24} xl={8} >
         <Card style={{ height: "100%" }} >
-          <Profiler id="chart-nivo" onRender={(_id, _phase, duration) => { divRef?.current && (divRef.current.textContent = "last render time: " + (duration.toFixed(3) || "")); }}>
+          <Profiler id="chart-nivo" onRender={(_id, _phase, duration) => { divRef?.current && (divRef.current.textContent = "Time to Render: " + (duration.toFixed(3) || "")); }}>
             <Chart />
           </Profiler>
           <div ref={divRef} style={{ position: "absolute", bottom: 4, left: 4 }} />
@@ -150,6 +144,11 @@ const nivoLineDefaults: Omit<ResponsiveLine["props"], "data"> = {
 `}
             </SyntaxHighlighter>
           </div>
+        </Card>
+      </Col>
+      <Col xs={24}>
+        <Card>
+          {tableVis}
         </Card>
       </Col>
     </Row>
