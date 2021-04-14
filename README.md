@@ -13,6 +13,17 @@ visualization libraries are easy to use, too.
 
 In this repository, we present **Nivo** and **Recharts**.
 
+## Screenshots
+
+Figure 1: Nivo Chart Console, 1. Line chart in canvas, data, code sample and table view
+![Nivo Chart Console](./img/nivo-screenshot.jpg)
+
+Figure 2: Line Simplification Makes Performance, a small fraction of points is enough to draw the visually same line chart
+![Line Simplification Makes Performance](./img/line-simplification.jpg)
+
+Figure 3: Recharts Example, SVG-based line chart detail
+![Recharts Example](./img/recharts-detail.jpg)
+
 ## Quick Start
 
 * Prerequisites
